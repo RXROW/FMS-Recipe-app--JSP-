@@ -17,6 +17,9 @@ import MasterLayout from './Moduals/Shared/MasterLayout/MasterLayout';
 import NotFound from './Moduals/Shared/NotFound/NotFound';
 import UsersList from './Moduals/Users/UsersList/UsersList';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 function App() { 
 
   const routes = createBrowserRouter([
@@ -51,6 +54,7 @@ function App() {
   ]);
   return (
    <>
+         <ToastContainer />
          <RouterProvider router={routes} />
    
    </>
