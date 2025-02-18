@@ -1,1 +1,12 @@
- 
+.auth-container {
+    background-image: url(./assets/images/overlay-image.png);
+    background-size: cover;
+    background-position: center center;
+    font-family: "Montserrat", sans-serif;
+}
+
+.bg-overlay {
+    background: linear-gradient(to top left,
+            rgba(0, 0, 0, 0.689),
+            rgba(55, 140, 47, 0.516));
+}
