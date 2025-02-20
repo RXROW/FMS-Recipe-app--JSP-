@@ -1,0 +1,45 @@
+ .container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+ 
+.sidebar {
+    width:  auto; 
+    transition: width 0.3s ease-in-out;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+ 
+.header {
+    height: 64px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+ 
+.body {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+} 
+@media (max-width: 900px) {
+    .sidebar {
+        width: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .body {
+        padding: 16px;
+    }
+}
