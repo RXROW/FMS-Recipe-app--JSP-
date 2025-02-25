@@ -1,7 +1,6 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import React, {  useContext } from "react"; 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -22,36 +21,11 @@ import MasterLayout from "./Moduals/Shared/MasterLayout/MasterLayout";
 import NotFound from "./Moduals/Shared/NotFound/NotFound";
 import UsersList from "./Moduals/Users/UsersList/UsersList";
 import ProtectedRoute from "./Moduals/Shared/ProtectedRoute/ProtectedRoute";
+import { AuthContext } from "./context/AuthContext/AuthContext";
 
 function App() {
-  const [loginData, setLoginData] = useState(null);
-  console.log(loginData)
- 
-  useEffect(() => {
-    const encodedToken = localStorage.getItem("token");
-    if (encodedToken) {
-      try {
-        const decodedToken = jwtDecode(encodedToken);
-        setLoginData(decodedToken);
-      } catch (error) {
-        console.error("Invalid token:", error);
-        setLoginData(null);
-      }
-    }
-  }, []);
-
-  const saveLoginData = () => {
-    const encodedToken = localStorage.getItem("token");
-    if (encodedToken) {
-      try {
-        const decodedToken = jwtDecode(encodedToken);
-        setLoginData(decodedToken);
-      } catch (error) {
-        console.error("Invalid token:", error);
-        setLoginData(null);
-      }
-    }
-  }; 
+   
+  const { loginData} = useContext(AuthContext);
 
   const routes = createBrowserRouter([
     {
@@ -60,8 +34,8 @@ function App() {
       errorElement: <NotFound />,
       children: [
         { index: true, 
-          element: loginData ? <Navigate to="/dashboard" /> : <Login loginData={loginData} saveLoginData={saveLoginData} /> },
-        { path: "login", element: <Login  loginData={loginData} saveLoginData={saveLoginData} /> },
+          element: loginData ? <Navigate to="/dashboard" /> : <Login   /> },
+        { path: "login", element: <Login   /> },
         { path: "register", element: <Register /> },
         { path: "forget-password", element: <ForgetPass /> },
         { path: "reset-password", element: <ResetPass /> },
@@ -72,17 +46,16 @@ function App() {
       path: "/dashboard",
       element: (
         <ProtectedRoute>
-          <MasterLayout loginData={loginData} />
+          <MasterLayout  />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <Dashboard loginData={loginData} /> },
+        { index: true, element: <Dashboard /> },
         { path: "recipes", element: <Recipelist /> },
         { path: "recipes/new-recipe", element: <Recipesform /> },
         { path: "recipe-data", element: <Recipedata /> },
-        { path: "categories", element: <Categoriedata /> },
-        { path: "category-data", element: <Categorielist /> },
+        { path: "categories", element: <Categorielist /> }, 
         { path: "users", element: <UsersList /> },
         { path: "favorites", element: <Favorite /> },
       ],

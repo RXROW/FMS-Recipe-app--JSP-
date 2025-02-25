@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { toast } from "react-toastify"; 
 import logo from "../../../assets/images/logo.png";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import {  axiosPublicInstance,  USER_URLS } from "../../../Services/Urls/Urls";
+import { EMAIL_VALIDATION } from "../../../Services/Valdition";
 
-const Login = ({ loginData, saveLoginData }) => {
+const Login = ( ) => {
+  
+   const {saveLoginData , loginData} = useContext(AuthContext)
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   
-  // Check if the user is already logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (loginData || token) {
       navigate("/dashboard");
-      window.location.reload(); // Refresh after navigation
     }
-  }, [loginData, navigate]);
+  }, []);
 
   const {
     register,
@@ -26,8 +29,8 @@ const Login = ({ loginData, saveLoginData }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        "https://upskilling-egypt.com:3006/api/v1/Users/Login",
+      const response = await axiosPublicInstance.post( 
+        USER_URLS.LOGIN,
         data
       );
 
@@ -40,8 +43,7 @@ const Login = ({ loginData, saveLoginData }) => {
         theme: "colored",
       });
 
-      navigate("/dashboard");
-      window.location.reload(); // Refresh after login
+      navigate("/dashboard"); 
     } catch (error) {
       toast.error(
         error?.response?.data?.message || "An error occurred. Please try again.",
@@ -76,13 +78,7 @@ const Login = ({ loginData, saveLoginData }) => {
                     type="email"
                     className="form-control"
                     placeholder="Enter your email"
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: {
-                        value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                        message: "Invalid email address",
-                      },
-                    })}
+                    {...register("email",EMAIL_VALIDATION )}
                   />
                 </div>
                 {errors.email && <span className="text-danger">{errors.email.message}</span>}

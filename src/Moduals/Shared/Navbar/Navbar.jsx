@@ -1,8 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
+import React ,{useContext}from 'react'
  import avatar from '../../../assets/images/avatar.png'
+import { AuthContext } from '../../../context/AuthContext/AuthContext';
 
-export default function Navbar({loginData}) { 
+export default function Navbar() {
+  
+  const { loginData} = useContext(AuthContext) 
   return (
     <>
       <nav className="navbar navbar-expand-md ">

@@ -4,17 +4,17 @@ import SideBar from "../SideBar/SideBar";
 import Navbar from "../Navbar/Navbar";
 import styles from "./MasterLayout.module.css";
 
-const MasterLayout = ({ loginData }) => { 
+const MasterLayout = ( ) => { 
   
 
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <SideBar loginData={loginData} />
+        <SideBar   />
       </div>
       <div className={styles.content}>
         <div className={styles.header}>
-          <Navbar loginData={loginData} />
+          <Navbar  />
         </div>
         <div className={styles.body}>
           <Outlet />

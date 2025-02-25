@@ -2,8 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../assets/images/logo.png";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { toast } from "react-toastify"; 
+
+import {  axiosPublicInstance,  USER_URLS } from "../../../Services/Urls/Urls";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -15,12 +16,11 @@ const ForgotPassword = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-       "https://upskilling-egypt.com:3006/api/v1/Users/Reset/Request",
+      const response = await axiosPublicInstance.post(
+        USER_URLS.FORGET_PASS,
         data
       );
-      console.log(response.data);
-      
+
       toast.success("Reset link sent! Check your email.", {
         position: "top-center",
         autoClose: 3000,
@@ -47,7 +47,12 @@ const ForgotPassword = () => {
           <div className="col-lg-4 col-md-6 bg-white rounded-3 shadow p-4">
             {/* Logo Section */}
             <div className="text-center mb-3">
-              <img src={logo} alt="Company Logo" className="img-fluid" width={330} />
+              <img
+                src={logo}
+                alt="Company Logo"
+                className="img-fluid"
+                width={330}
+              />
             </div>
 
             {/* Title */}
@@ -58,7 +63,7 @@ const ForgotPassword = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <div className="my-5"> 
+              <div className="my-5">
                 <div className="input-group">
                   <span className="input-group-text">
                     <i className="fa fa-envelope text-secondary"></i>
@@ -66,7 +71,9 @@ const ForgotPassword = () => {
                   <input
                     type="email"
                     id="email"
-                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errors.email ? "is-invalid" : ""
+                    }`}
                     placeholder="Enter your email"
                     {...register("email", {
                       required: "Email is required",
@@ -76,12 +83,20 @@ const ForgotPassword = () => {
                       },
                     })}
                   />
-                  {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
+                  {errors.email && (
+                    <div className="invalid-feedback">
+                      {errors.email.message}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Submit Button */}
-              <button type="submit" className="btn btn-success w-100" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="btn btn-success w-100"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Sending..." : "Submit"}
               </button>
             </form>

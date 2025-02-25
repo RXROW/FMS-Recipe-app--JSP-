@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../assets/images/logo.png";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { toast } from "react-toastify"; 
+
+import {  axiosPublicInstance,  USER_URLS } from "../../../Services/Urls/Urls";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -27,8 +28,8 @@ const ResetPassword = () => {
     } 
    
     try {
-      let response = await axios.post(
-        "https://upskilling-egypt.com:3006/api/v1/Users/Reset",
+      const response = await axiosPublicInstance.post( 
+        USER_URLS.RESET_PASS,
         data
       );
       console.log(response.data);

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState ,useContext} from 'react';
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../../assets/images/sideBarLogo.png';
 import styles from './SideBar.module.css';
+import { AuthContext } from '../../../context/AuthContext/AuthContext';
 
-export default function SideBar({ loginData }) {
+export default function SideBar( ) {
+  
+     const {  loginData} = useContext(AuthContext)
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 900);
