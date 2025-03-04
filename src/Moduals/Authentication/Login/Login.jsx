@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import logo from "../../../assets/images/logo.png";
 import { AuthContext } from "../../../context/AuthContext/AuthContext";
 import {  axiosPublicInstance,  USER_URLS } from "../../../Services/Urls/Urls";
-import { EMAIL_VALIDATION } from "../../../Services/Valdition";
+import { EMAIL_VALIDATION, PASSWORD_VALIDATION } from "../../../Services/Valdition";
 
 const Login = ( ) => {
   
@@ -16,10 +16,10 @@ const Login = ( ) => {
   
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (loginData || token) {
+    if (token) {
       navigate("/dashboard");
     }
-  }, []);
+  }, [ ]);
 
   const {
     register,
@@ -94,7 +94,7 @@ const Login = ( ) => {
                     type={showPassword ? "text" : "password"}
                     className="form-control"
                     placeholder="Enter your password"
-                    {...register("password", { required: "Password is required" })}
+                    {...register("password",PASSWORD_VALIDATION)}
                   />
                   <button
                     type="button"

@@ -1,13 +1,14 @@
-import React, { useEffect, useState ,useContext} from 'react';
-import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import logo from '../../../assets/images/sideBarLogo.png';
-import styles from './SideBar.module.css';
-import { AuthContext } from '../../../context/AuthContext/AuthContext';
+import React, { useEffect, useState, useContext } from "react";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import logo from "../../../assets/images/sideBarLogo.png";
+import styles from "./SideBar.module.css";
+import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import ChangePasswordModal from "../../Shared/ChangePasswordModal/ChangePasswordModal";
 
-export default function SideBar( ) {
-  
-     const {  loginData} = useContext(AuthContext)
+export default function SideBar() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { loginData } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 900);
@@ -23,12 +24,12 @@ export default function SideBar( ) {
   }, []);
 
   const logOut = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
-    <div className={`${styles.sidebarWrapper} ${isCollapsed ? styles.collapsed : ''}`}>
+    <div className={`${styles.sidebarWrapper} ${isCollapsed ? styles.collapsed : ""}`}>
       <Sidebar collapsed={isCollapsed} className={styles.sidebar}>
         <div className={styles.logoContainer}>
           <button className={styles.logoButton} onClick={toggleCollapse}>
@@ -87,7 +88,7 @@ export default function SideBar( ) {
 
           <MenuItem
             icon={<i className="fa-solid fa-unlock-keyhole" />}
-            onClick={() => console.log("Change Password")}
+            onClick={() => setIsModalOpen(true)}
             className={styles.menuItem}
           >
             Change Password
@@ -102,6 +103,9 @@ export default function SideBar( ) {
           </MenuItem>
         </Menu>
       </Sidebar>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

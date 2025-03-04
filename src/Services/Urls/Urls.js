@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const baseURL = "https://upskilling-egypt.com:3006/api/v1";
  
-const getToken = () => localStorage.getItem("token") || "";
+const getToken = () => localStorage.getItem("token");
+console.log(getToken)
  
 export const axiosPrivetInstance = axios.create({
   baseURL,
@@ -32,17 +33,10 @@ export const RECIPES_URLS = {
   DELETE: (id) => `/Recipe/${id}`,
 };
 
-
-
- 
-  
- 
-
-
-
 export const CATEGORY_ENDPOINTS = {
   LIST: "/Category",
   CREATE: "/Category",
   UPDATE: (id) => `/Category/${id}`,
   DELETE: (id) => `/Category/${id}`,
 };
+export const CHANGE_PASS =  "/Users/ChangePassword"
