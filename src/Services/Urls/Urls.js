@@ -3,7 +3,7 @@ import axios from "axios";
 export const baseURL = "https://upskilling-egypt.com:3006/api/v1";
  
 const getToken = () => localStorage.getItem("token");
-console.log(getToken)
+ 
  
 export const axiosPrivetInstance = axios.create({
   baseURL,

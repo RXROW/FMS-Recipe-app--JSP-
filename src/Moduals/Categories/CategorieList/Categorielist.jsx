@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState   } from "react";
 import Modal from "react-bootstrap/Modal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,15 +6,13 @@ import { useForm } from "react-hook-form";
 import NoData from "../../Shared/NoData/NoData";
 import Header from "../../Shared/Header/Header";
 import DeleteConfirmations from "../../Shared/DeleteConfirmations/DeleteConfirmations";
-import img from "../../../assets/images/categoryHeader.png"; 
-import { AuthContext } from "../../../context/AuthContext/AuthContext";
+import img from "../../../assets/images/categoryHeader.png";  
 import {
   axiosPrivetInstance,
   CATEGORY_ENDPOINTS,
 } from "../../../Services/Urls/Urls";
 
-export default function CategoryList() {
-  const { loginData } = useContext(AuthContext);
+export default function CategoryList() { 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +64,7 @@ export default function CategoryList() {
       const response = await axiosPrivetInstance.get(CATEGORY_ENDPOINTS.LIST, {
         params,
       });
-      setCategories(response.data.data || []);
+      setCategories(response.data.data);
       setTotalPages(response.data.totalNumberOfPages || 1);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -193,7 +191,7 @@ export default function CategoryList() {
         deleteFuncation={deleteSelectedCategory}
       />
 
-      {/* Add/Update Category Modal */}
+      
       <Modal
         show={showModal && (modalType === "add" || modalType === "update")}
         onHide={handleCloseModal}
@@ -238,7 +236,7 @@ export default function CategoryList() {
           </form>
         </Modal.Body>
       </Modal>
- 
+
       <div className="d-flex justify-content-between align-items-center p-4">
         <div>
         <h4>Categories Table Details</h4>
@@ -251,6 +249,13 @@ export default function CategoryList() {
           Add New Category
         </button>
       </div>
+
+      <div className="bg-gray p-4 m-4 rounded d-flex justify-content-between align-items-center"> 
+  <p>Name</p>
+  <p>Action</p>
+</div>
+
+
 
       {/* Search Bar */}
       <div className="px-4 pb-3">
@@ -266,7 +271,7 @@ export default function CategoryList() {
       </div>
 
       {/* Categories Table */}
-      <div className="table-responsive p-4 ">
+      <div className="table-responsive p-4 overflow-auto  ">
         {isLoading ? (
           <div className="text-center py-5">
             <div className="spinner-border text-success" role="status">
@@ -276,7 +281,7 @@ export default function CategoryList() {
           </div>
         ) : categories.length > 0 ? (
           <>
-            <table className="table table-hover table-striped border rounded overflow-hidden">
+            <table className="table table-hover table-striped border rounded  overflow-auto  ">
               <thead className=" rounded-top">
                 <tr>
                   <th scope="col">Id</th>
@@ -301,14 +306,14 @@ export default function CategoryList() {
                         onClick={() => handleShowModal("update", category.id)}
                         title="Edit Category"
                       >
-                        <i className="fa fa-edit text-warning text-lg" ></i>
+                        <i className="fa fa-edit text-success text-lg" ></i>
                       </button>
                       <button
                         className="btn "
                         onClick={() => handleShowModal("delete", category.id)}
                         title="Delete Category"
                       >
-                        <i className="fa fa-trash text-danger"></i>
+                        <i className="fa fa-trash text-success"></i>
                       </button>
                     </td>
                   </tr>
