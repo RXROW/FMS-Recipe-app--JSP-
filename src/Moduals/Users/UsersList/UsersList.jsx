@@ -87,7 +87,7 @@ export default function UsersList() {
     <>
       <Header
         title="Users List"
-        decsription="You can check all details"
+        decsription="You can now add your items that any user can order it from the Application and you can edit"
         img={imgheader}
       />
       
@@ -102,9 +102,10 @@ export default function UsersList() {
         <div className="row align-items-center mb-4">
           <div className="col">
             <h4 className="mb-0">Users Management</h4>
+            <p>You can check all details</p>
           </div>
         </div>
- 
+      
         {isLoading && (
           <div className="text-center my-5">
             <div className="spinner-border text-success" role="status">
@@ -113,26 +114,29 @@ export default function UsersList() {
             <p className="mt-2">Loading Users...</p>
           </div>
         )}
- 
+   <div className="bg-gray p-4 my-4 rounded d-flex justify-content-between align-items-center">
+        <p>Name</p>
+        <p>Action</p>
+      </div>
         <div className="table-responsive bg-light rounded shadow-sm">
           {!isLoading && usersList.length > 0 ? (
             <>
               <table className="table table-striped table-hover">
                 <thead className="bg-light">
-                  <tr>
+                  <tr> 
                     <th scope="col">Name</th>
                     <th scope="col">Image</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Discount</th>
-                    <th scope="col">Category</th>
+                    <th scope="col">Phone number</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Country</th>
+               
                     <th scope="col" className="text-center"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {usersList.map((user) => (
                     <tr key={user.id}>
-                      <td className="align-middle">Noodles with Sushi</td>
+                      <td className="align-middle">{user?.userName}</td>
                       <td className="align-middle">
                         {user.imagePath ? (
                           <img
@@ -158,10 +162,9 @@ export default function UsersList() {
                           />
                         )}
                       </td>
-                      <td className="align-middle">350.99</td>
-                      <td className="align-middle">Rice-cook with noodles</td>
-                      <td className="align-middle">20</td>
-                      <td className="align-middle">Noodles</td>
+                      <td className="align-middle">{user?.phoneNumber}</td>
+                      <td className="align-middle">{user?.email}</td>
+                      <td className="align-middle">{user?.country}</td> 
                       <td className="align-middle text-center position-relative">
                         <div className="dropdown">
                           <button
