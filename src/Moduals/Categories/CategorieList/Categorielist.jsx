@@ -1,4 +1,4 @@
-import React, { useEffect, useState   } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,13 +6,13 @@ import { useForm } from "react-hook-form";
 import NoData from "../../Shared/NoData/NoData";
 import Header from "../../Shared/Header/Header";
 import DeleteConfirmations from "../../Shared/DeleteConfirmations/DeleteConfirmations";
-import img from "../../../assets/images/categoryHeader.png";  
+import img from "../../../assets/images/categoryHeader.png";
 import {
   axiosPrivetInstance,
   CATEGORY_ENDPOINTS,
 } from "../../../Services/Urls/Urls";
 
-export default function CategoryList() { 
+export default function CategoryList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +20,8 @@ export default function CategoryList() {
   const [categories, setCategories] = useState([]);
   const [modalType, setModalType] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
+  const [visibleActionRows, setVisibleActionRows] = useState({});
 
   const {
     register,
@@ -47,6 +48,28 @@ export default function CategoryList() {
     }
 
     setShowModal(true);
+  };
+
+  // Toggle visibility for a specific row
+  const toggleActionVisibility = (categoryId) => {
+    setVisibleActionRows(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
+  // Hide all other action rows when one is clicked
+  const handleShowActionForRow = (categoryId) => {
+    // Create a new object with all values set to false
+    const updatedVisibility = {};
+    categories.forEach(cat => {
+      updatedVisibility[cat.id] = false;
+    });
+
+    // Set the clicked row to true
+    updatedVisibility[categoryId] = true;
+
+    setVisibleActionRows(updatedVisibility);
   };
 
   const fetchCategories = async (page = 1, nameFilter = "") => {
@@ -95,11 +118,29 @@ export default function CategoryList() {
   };
 
   const updateCategoryDetails = async (data) => {
-    try {
+    try { 
+      if (data.name === "") {
+        toast.error("Category name is required");
+        return;
+      }
+      
+      if (data.name.length < 3) {
+        toast.error("Category name must be at least 3 characters");
+        return;
+      }
+      
+      const originalCategory = categories.find(cat => cat.id === selectedCategoryId);
+      if (originalCategory && data.name === originalCategory.name) {
+        toast.error("No changes detected");
+        return;
+      }
+      
       await axiosPrivetInstance.put(
         CATEGORY_ENDPOINTS.UPDATE(selectedCategoryId),
         { name: data.name }
       );
+      
+      console.log(data.name);
       toast.success("Category updated successfully");
       fetchCategories(currentPage, searchTerm);
       handleCloseModal();
@@ -126,6 +167,8 @@ export default function CategoryList() {
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      // Reset action visibility when changing pages
+      setVisibleActionRows({});
     }
   };
 
@@ -147,9 +190,8 @@ export default function CategoryList() {
           {[...Array(totalPages)].map((_, index) => (
             <li
               key={index}
-              className={`page-item ${
-                currentPage === index + 1 ? "active" : ""
-              }`}
+              className={`page-item ${currentPage === index + 1 ? "active" : ""
+                }`}
             >
               <button
                 className="page-link"
@@ -161,9 +203,8 @@ export default function CategoryList() {
           ))}
 
           <li
-            className={`page-item ${
-              currentPage === totalPages ? "disabled" : ""
-            }`}
+            className={`page-item ${currentPage === totalPages ? "disabled" : ""
+              }`}
           >
             <button
               className="page-link"
@@ -176,6 +217,29 @@ export default function CategoryList() {
       </nav>
     );
   };
+
+  // Click outside handler to close all action buttons
+  useEffect(() => {
+    function handleClickOutside(event) {
+      const actionElements = document.querySelectorAll('.action-container');
+      let clickedInside = false;
+
+      actionElements.forEach(element => {
+        if (element.contains(event.target)) {
+          clickedInside = true;
+        }
+      });
+
+      if (!clickedInside) {
+        setVisibleActionRows({});
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -191,7 +255,6 @@ export default function CategoryList() {
         deleteFuncation={deleteSelectedCategory}
       />
 
-      
       <Modal
         show={showModal && (modalType === "add" || modalType === "update")}
         onHide={handleCloseModal}
@@ -239,23 +302,21 @@ export default function CategoryList() {
 
       <div className="d-flex justify-content-between align-items-center p-4">
         <div>
-        <h4>Categories Table Details</h4>
-        <p>You can check all details</p>
+          <h4>Categories Table Details</h4>
+          <p>You can check all details</p>
         </div>
         <button
-          className="btn btn-success "
+          className="btn btn-success"
           onClick={() => handleShowModal("add")}
-        > 
+        >
           Add New Category
         </button>
       </div>
 
-      <div className="bg-gray p-4 m-4 rounded d-flex justify-content-between align-items-center"> 
-  <p>Name</p>
-  <p>Action</p>
-</div>
-
-
+      <div className="bg-gray p-4 m-4 rounded d-flex justify-content-between align-items-center">
+        <p>Name</p>
+        <p>Action</p>
+      </div>
 
       {/* Search Bar */}
       <div className="px-4 pb-3">
@@ -271,7 +332,7 @@ export default function CategoryList() {
       </div>
 
       {/* Categories Table */}
-      <div className="table-responsive p-4 overflow-auto  ">
+      <div className="table-responsive p-4 overflow-auto">
         {isLoading ? (
           <div className="text-center py-5">
             <div className="spinner-border text-success" role="status">
@@ -281,8 +342,8 @@ export default function CategoryList() {
           </div>
         ) : categories.length > 0 ? (
           <>
-            <table className="table table-hover table-striped border rounded  overflow-auto  ">
-              <thead className=" rounded-top">
+            <table className="table table-hover table-striped border rounded overflow-auto">
+              <thead className="rounded-top">
                 <tr>
                   <th scope="col">Id</th>
                   <th scope="col">Name</th>
@@ -301,20 +362,38 @@ export default function CategoryList() {
                       {new Date(category.creationDate).toLocaleDateString()}
                     </td>
                     <td className="text-center">
-                      <button
-                        className="btn "
-                        onClick={() => handleShowModal("update", category.id)}
-                        title="Edit Category"
-                      >
-                        <i className="fa fa-edit text-success text-lg" ></i>
-                      </button>
-                      <button
-                        className="btn "
-                        onClick={() => handleShowModal("delete", category.id)}
-                        title="Delete Category"
-                      >
-                        <i className="fa fa-trash text-success"></i>
-                      </button>
+                      <div className="action-container position-relative">
+                        {visibleActionRows[category.id] ? (
+                          <div className="bg-white shadow rounded position-absolute end-0 p-2 flex-column d-flex" style={{ minWidth: '120px', zIndex: 100, right: '0' }}>
+                            <button
+                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2"
+                              onClick={() => handleShowModal("update", category.id)}
+                              title="Edit Category"
+                            >
+                              <i className="fa fa-edit text-success"></i>
+                              <span>Edit</span>
+                            </button>
+                            <div className="dropdown-divider my-1"></div>
+                            <button
+                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2"
+                              onClick={() => handleShowModal("delete", category.id)}
+                              title="Delete Category"
+                            >
+                              <i className="fa fa-trash text-danger"></i>
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            className="btn btn-sm rounded-circle"
+                            onClick={() => handleShowActionForRow(category.id)}
+                            title="Show Actions"
+                            style={{ width: '32px', height: '32px' }}
+                          >
+                            <i className="fa fa-ellipsis-v"></i>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
