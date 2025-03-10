@@ -5,18 +5,19 @@ import "react-toastify/dist/ReactToastify.css";
 import imgheader from "../../../assets/images/categoryHeader.png";
 import NoData from "../../Shared/NoData/NoData";
 import Nodata from "../../../assets/images/No-Data.png";
-import axios from "axios";
+import { axiosPrivetInstance, USER_URLS } from "../../../Services/Urls/Urls";
 import DeleteConfirmations from "../../Shared/DeleteConfirmations/DeleteConfirmations";
 
 export default function UsersList() {
   const [usersList, setUsersList] = useState([]);
-  const [arrayOfPages, setArrayOfPages] = useState([]);
+  
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(7);
   const [isLoading, setIsLoading] = useState(false);
   
   const [selectedId, setSelectedId] = useState(0);
   const [show, setShow] = useState(false);
+  const [showActionMenu, setShowActionMenu] = useState(null);
 
   const handleClose = () => setShow(false);
 
@@ -25,31 +26,30 @@ export default function UsersList() {
     setShow(true);
   };
 
+  const toggleActionMenu = (id) => {
+    if (showActionMenu === id) {
+      setShowActionMenu(null);
+    } else {
+      setShowActionMenu(id);
+    }
+  };  
   const getUsers = async (pageNo = currentPage, size = pageSize) => {
     setIsLoading(true);
     try {
-      let response = await axios.get(
-        `https://upskilling-egypt.com:3006/api/v1/Users/`,
-        {
-          params: {
-            pageSize: size,
-            pageNumber: pageNo
-          },
-          headers: { Authorization: localStorage.getItem("token") }
-        }
-      );
-      
-      setArrayOfPages(
-        Array(response.data.totalPages)
-          .fill()
-          .map((_, i) => i + 1)
-      );
+      const params = {
+        pageNumber: pageNo,
+        pageSize: size,
+      };
+
+      const response = await axiosPrivetInstance.get(USER_URLS.LIST, {
+        params,
+      });
       setUsersList(response.data.data);
       setCurrentPage(pageNo);
       setPageSize(size);
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error(error.response?.data?.message || "Error fetching users");
+      toast.error("Failed to load users. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -57,30 +57,37 @@ export default function UsersList() {
 
   const deleteUser = async () => {
     try {
-      await axios.delete(
-        `https://upskilling-egypt.com:3006/api/v1/Users/${selectedId}`,
-        {
-          headers: { Authorization: localStorage.getItem("token") }
-        }
-      ); 
-      getUsers(); // Re-fetch users after deletion
+      await axiosPrivetInstance.delete(
+        USER_URLS.DELETE(selectedId)
+      );
       toast.success("User deleted successfully");
+      handleClose();
+      getUsers(); 
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error deleting User:", error);
       toast.error(error.response?.data?.message || "Failed to delete User");
     }
-    handleClose();
+  };
+
+  const handleViewUser = (id) => { 
+    console.log("Viewing user", id);
+    setShowActionMenu(null);
+  };
+
+  const handleDeleteUser = (id) => {
+    handleShow(id);
+    setShowActionMenu(null);
   };
 
   useEffect(() => {
-    getUsers(1, 5);
+    getUsers(1, 7);
   }, []);
 
   return (
     <>
       <Header
         title="Users List"
-        description="This is a welcoming screen for the entry of the application, you can now see the options"
+        decsription="You can check all details"
         img={imgheader}
       />
       
@@ -97,53 +104,51 @@ export default function UsersList() {
             <h4 className="mb-0">Users Management</h4>
           </div>
         </div>
-
-        {/* Loading indicator */}
+ 
         {isLoading && (
           <div className="text-center my-5">
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-success" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
-            <p className="mt-2">Loading users...</p>
+            <p className="mt-2">Loading Users...</p>
           </div>
         )}
-
-        {/* Users Table */}
-        <div className="table-responsive">
+ 
+        <div className="table-responsive bg-light rounded shadow-sm">
           {!isLoading && usersList.length > 0 ? (
             <>
-              <table className="table table-striped table-hover border shadow-sm">
-                <thead className="table-dark">
+              <table className="table table-striped table-hover">
+                <thead className="bg-light">
                   <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Image</th>
-                    <th scope="col">Phone number</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Country</th>
-                    <th scope="col" className="text-center">Actions</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Discount</th>
+                    <th scope="col">Category</th>
+                    <th scope="col" className="text-center"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {usersList.map((user) => (
                     <tr key={user.id}>
-                      <td className="align-middle">{user.userName}</td>
+                      <td className="align-middle">Noodles with Sushi</td>
                       <td className="align-middle">
                         {user.imagePath ? (
                           <img
                             src={`https://upskilling-egypt.com:3006/${user.imagePath}`}
-                            alt={user.userName}
-                            className=""
+                            alt={user.name}
                             style={{
                               width: "60px",
                               height: "60px",
-                              objectFit: "cover",
+                              objectFit: "contain",
                             }}
                           />
                         ) : (
                           <img
                             src={Nodata}
-                            alt={user.userName}
-                            className="rounded-circle bg-light"
+                            alt="User image"
+                            className="rounded bg-light"
                             style={{
                               width: "60px",
                               height: "60px",
@@ -153,78 +158,56 @@ export default function UsersList() {
                           />
                         )}
                       </td>
-                      <td className="align-middle">{user.phoneNumber || "-"}</td>
-                      <td className="align-middle">{user.email}</td>
-                      <td className="align-middle">{user.country || "-"}</td>
-                      <td className="align-middle text-center">
-                        <button
-                          className="btn btn-sm btn-outline-danger me-2"
-                          onClick={() => handleShow(user.id)}
-                          title="Delete User"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-info"
-                          title="View User Details"
-                        >
-                          <i className="fa fa-eye"></i>
-                        </button>
+                      <td className="align-middle">350.99</td>
+                      <td className="align-middle">Rice-cook with noodles</td>
+                      <td className="align-middle">20</td>
+                      <td className="align-middle">Noodles</td>
+                      <td className="align-middle text-center position-relative">
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-sm"
+                            onClick={() => toggleActionMenu(user.id)}
+                          >
+                            <i className="fa fa-ellipsis-v fs-5"></i>
+                          </button>
+                          
+                          {showActionMenu === user.id && (
+                            <div 
+                              className="dropdown-menu show shadow-sm position-absolute" 
+                              style={{ right: 0 }}
+                            >
+                              <button 
+                                className="dropdown-item d-flex align-items-center" 
+                                onClick={() => handleViewUser(user.id)}
+                              >
+                                <i className="fa fa-eye text-success me-2"></i> View
+                              </button>
+                              <button 
+                                className="dropdown-item d-flex align-items-center" 
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                <i className="fa fa-trash text-success me-2"></i> Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
-              {/* Pagination */}
-              <nav aria-label="Page navigation" className="d-flex justify-content-center mt-4">
-                <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button 
-                      className="page-link" 
-                      onClick={() => getUsers(currentPage - 1)}
-                      aria-label="Previous"
-                    >
-                      <span aria-hidden="true">&laquo;</span>
-                    </button>
-                  </li>
-                  
-                  {arrayOfPages.map((pageNo) => (
-                    <li
-                      className={`page-item ${currentPage === pageNo ? 'active' : ''}`}
-                      key={pageNo}
-                    >
-                      <button 
-                        className="page-link" 
-                        onClick={() => getUsers(pageNo)}
-                      >
-                        {pageNo}
-                      </button>
-                    </li>
-                  ))}
-                  
-                  <li className={`page-item ${currentPage === arrayOfPages.length ? 'disabled' : ''}`}>
-                    <button 
-                      className="page-link" 
-                      onClick={() => getUsers(currentPage + 1)}
-                      aria-label="Next"
-                    >
-                      <span aria-hidden="true">&raquo;</span>
-                    </button>
-                  </li>
-                </ul>
-              </nav>
             </>
           ) : !isLoading ? (
             <NoData />
           ) : null}
         </div>
       </div>
-        <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-            />
+      
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+      />
     </>
   );
 }

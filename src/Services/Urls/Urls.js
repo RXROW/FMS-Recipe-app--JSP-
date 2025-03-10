@@ -22,7 +22,9 @@ export const USER_URLS = {
   REGISTER: "/Users/Register",
   FORGET_PASS: "/Users/Reset/Request",
   RESET_PASS: "/Users/Reset",
+  LIST:`/Users`,
   GET_USER: (id) => `/Users/${id}`,
+  DELETE: (id) => `/Users/${id}`,
 };
  
 export const RECIPES_URLS = {
