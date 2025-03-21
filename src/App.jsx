@@ -8,20 +8,19 @@ import ForgetPass from "./Moduals/Authentication/ForgetPass/ForgetPass";
 import Login from "./Moduals/Authentication/Login/Login";
 import Register from "./Moduals/Authentication/Register/Register";
 import ResetPass from "./Moduals/Authentication/ResetPass/ResetPass";
-import VerifyAccount from "./Moduals/Authentication/VerifyAccount/VerifyAccount";
-import Categoriedata from "./Moduals/Categories/CategorieData/Categoriedata";
+import VerifyAccount from "./Moduals/Authentication/VerifyAccount/VerifyAccount"; 
 import Categorielist from "./Moduals/Categories/CategorieList/Categorielist";
 import Dashboard from "./Moduals/dashboard/Dashboard";
 import Favorite from "./Moduals/Recipes/Favorite/Favorite";
 import Recipedata from "./Moduals/Recipes/Recipedata/Recipedata";
-import Recipelist from "./Moduals/Recipes/Recipelist/Recipelist";
-import Recipesform from "./Moduals/Recipes/Recipesform/Recipesform";
+import Recipelist from "./Moduals/Recipes/Recipelist/Recipelist"; 
 import AuthLayout from "./Moduals/Shared/AuthLayout/AuthLayout";
 import MasterLayout from "./Moduals/Shared/MasterLayout/MasterLayout";
 import NotFound from "./Moduals/Shared/NotFound/NotFound";
 import UsersList from "./Moduals/Users/UsersList/UsersList";
 import ProtectedRoute from "./Moduals/Shared/ProtectedRoute/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext/AuthContext";
+import RecipeForm from "./Moduals/Recipes/Recipesform/Recipesform";
 
 function App() {
    
@@ -53,7 +52,8 @@ function App() {
       children: [
         { index: true, element: <Dashboard /> },
         { path: "recipes", element: <Recipelist /> },
-        { path: "recipes/new-recipe", element: <Recipesform /> },
+        { path: "recipes/add", element: <RecipeForm/> },
+        { path: "recipes/edit/:id", element: <RecipeForm /> }, 
         { path: "recipe-data", element: <Recipedata /> },
         { path: "categories", element: <Categorielist /> }, 
         { path: "users", element: <UsersList /> },

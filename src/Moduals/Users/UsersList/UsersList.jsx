@@ -10,14 +10,14 @@ import DeleteConfirmations from "../../Shared/DeleteConfirmations/DeleteConfirma
 
 export default function UsersList() {
   const [usersList, setUsersList] = useState([]);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(7);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [selectedId, setSelectedId] = useState(0);
   const [show, setShow] = useState(false);
-  const [showActionMenu, setShowActionMenu] = useState(null);
+  const [showActionMenu, setShowActionMenu] = useState(false);
 
   const handleClose = () => setShow(false);
 
@@ -32,7 +32,7 @@ export default function UsersList() {
     } else {
       setShowActionMenu(id);
     }
-  };  
+  };
   const getUsers = async (pageNo = currentPage, size = pageSize) => {
     setIsLoading(true);
     try {
@@ -62,14 +62,14 @@ export default function UsersList() {
       );
       toast.success("User deleted successfully");
       handleClose();
-      getUsers(); 
+      getUsers();
     } catch (error) {
       console.error("Error deleting User:", error);
       toast.error(error.response?.data?.message || "Failed to delete User");
     }
   };
 
-  const handleViewUser = (id) => { 
+  const handleViewUser = (id) => {
     console.log("Viewing user", id);
     setShowActionMenu(null);
   };
@@ -90,7 +90,7 @@ export default function UsersList() {
         decsription="You can now add your items that any user can order it from the Application and you can edit"
         img={imgheader}
       />
-      
+
       <DeleteConfirmations
         show={show}
         handleClose={handleClose}
@@ -105,7 +105,11 @@ export default function UsersList() {
             <p>You can check all details</p>
           </div>
         </div>
-      
+        <div className="bg-gray p-4 my-4 rounded d-flex justify-content-between align-items-center">
+          <p>Name</p>
+          <p>Action</p>
+        </div>
+
         {isLoading && (
           <div className="text-center my-5">
             <div className="spinner-border text-success" role="status">
@@ -114,22 +118,20 @@ export default function UsersList() {
             <p className="mt-2">Loading Users...</p>
           </div>
         )}
-   <div className="bg-gray p-4 my-4 rounded d-flex justify-content-between align-items-center">
-        <p>Name</p>
-        <p>Action</p>
-      </div>
+
         <div className="table-responsive bg-light rounded shadow-sm">
           {!isLoading && usersList.length > 0 ? (
+
             <>
               <table className="table table-striped table-hover">
                 <thead className="bg-light">
-                  <tr> 
+                  <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Image</th>
                     <th scope="col">Phone number</th>
                     <th scope="col">Email</th>
                     <th scope="col">Country</th>
-               
+
                     <th scope="col" className="text-center"></th>
                   </tr>
                 </thead>
@@ -164,7 +166,7 @@ export default function UsersList() {
                       </td>
                       <td className="align-middle">{user?.phoneNumber}</td>
                       <td className="align-middle">{user?.email}</td>
-                      <td className="align-middle">{user?.country}</td> 
+                      <td className="align-middle">{user?.country}</td>
                       <td className="align-middle text-center position-relative">
                         <div className="dropdown">
                           <button
@@ -173,20 +175,20 @@ export default function UsersList() {
                           >
                             <i className="fa fa-ellipsis-v fs-5"></i>
                           </button>
-                          
+
                           {showActionMenu === user.id && (
-                            <div 
-                              className="dropdown-menu show shadow-sm position-absolute" 
+                            <div
+                              className="dropdown-menu show shadow-sm position-absolute"
                               style={{ right: 0 }}
                             >
-                              <button 
-                                className="dropdown-item d-flex align-items-center" 
+                              <button
+                                className="dropdown-item d-flex align-items-center"
                                 onClick={() => handleViewUser(user.id)}
                               >
                                 <i className="fa fa-eye text-success me-2"></i> View
                               </button>
-                              <button 
-                                className="dropdown-item d-flex align-items-center" 
+                              <button
+                                className="dropdown-item d-flex align-items-center"
                                 onClick={() => handleDeleteUser(user.id)}
                               >
                                 <i className="fa fa-trash text-success me-2"></i> Delete
@@ -205,7 +207,7 @@ export default function UsersList() {
           ) : null}
         </div>
       </div>
-      
+
       <ToastContainer
         position="top-right"
         autoClose={3000}

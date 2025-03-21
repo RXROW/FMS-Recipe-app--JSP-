@@ -20,7 +20,7 @@ export default function CategoryList() {
   const [categories, setCategories] = useState([]);
   const [modalType, setModalType] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const [visibleActionRows, setVisibleActionRows] = useState({});
 
   const {
@@ -118,28 +118,28 @@ export default function CategoryList() {
   };
 
   const updateCategoryDetails = async (data) => {
-    try { 
+    try {
       if (data.name === "") {
         toast.error("Category name is required");
         return;
       }
-      
+
       if (data.name.length < 3) {
         toast.error("Category name must be at least 3 characters");
         return;
       }
-      
+
       const originalCategory = categories.find(cat => cat.id === selectedCategoryId);
       if (originalCategory && data.name === originalCategory.name) {
         toast.error("No changes detected");
         return;
       }
-      
+
       await axiosPrivetInstance.put(
         CATEGORY_ENDPOINTS.UPDATE(selectedCategoryId),
         { name: data.name }
       );
-      
+
       console.log(data.name);
       toast.success("Category updated successfully");
       fetchCategories(currentPage, searchTerm);
