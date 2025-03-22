@@ -5,20 +5,14 @@ import { AuthContext } from '../../../context/AuthContext/AuthContext';
 
 export default function Navbar() {
   
-  const { loginData} = useContext(AuthContext) 
-  return (
+  const { loginData } = useContext(AuthContext);
+   return (
     <>
       <nav className="navbar navbar-expand-md ">
         <div className="container-fluid px-4">
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <div className="d-flex w-100 justify-content-between align-items-center">
-              {/* search */}
-              <input
-                className="form-control rounded-5 w-75" 
-                type="search"
-                placeholder="Search Here"
-                aria-label="Search"
-              />
+            <div className="d-flex w-100 justify-content-end align-items-center">
+           
 
               {/* image */}
               <div className="d-flex align-items-center">

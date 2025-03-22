@@ -473,7 +473,7 @@ export default function RecipeList() {
         ) : filteredRecipes.length > 0 ? (
           <div className="card">
             <div className="card-body p-0">
-              <div className="table-responsive">
+              <div className="">
                 <table className="table table-hover mb-0">
                   <thead className="bg-light">
                     <tr>

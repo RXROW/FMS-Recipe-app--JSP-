@@ -15,7 +15,7 @@ const Dashboard = () => {
         }
         img={img}
       />
-      <div className="d-flex   container-fluid  px-md-4 px-2 ">
+      <div className="d-flex  bg-warning-dash  my-3 container-fluid  px-md-4 px-2 ">
         <div className='w-100  d-flex flex-md-row flex-column justify-content-between py-2 py-md-5  px-3 rounded-3 align-items-center dashboard-header'>
           <div className="caption mb-2 mb-md-0">
             <h4 className="mb-0"> {loginData?.userGroup === 'SystemUser' ? 'Show' : 'Fill'} the <span>Recipes</span>! </h4>

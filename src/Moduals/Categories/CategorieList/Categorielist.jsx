@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-bootstrap/Modal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +11,9 @@ import {
   axiosPrivetInstance,
   CATEGORY_ENDPOINTS,
 } from "../../../Services/Urls/Urls";
+
+// Constants
+const PAGE_SIZE = 5;
 
 export default function CategoryList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,7 +31,7 @@ export default function CategoryList() {
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const handleCloseModal = () => {
@@ -59,7 +62,11 @@ export default function CategoryList() {
   };
 
   // Hide all other action rows when one is clicked
-  const handleShowActionForRow = (categoryId) => {
+  const handleShowActionForRow = (categoryId, event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+
     // Create a new object with all values set to false
     const updatedVisibility = {};
     categories.forEach(cat => {
@@ -72,11 +79,11 @@ export default function CategoryList() {
     setVisibleActionRows(updatedVisibility);
   };
 
-  const fetchCategories = async (page = 1, nameFilter = "") => {
+  const fetchCategories = useCallback(async (page = 1, nameFilter = "") => {
     setIsLoading(true);
     try {
       const params = {
-        pageSize: 5,
+        pageSize: PAGE_SIZE,
         pageNumber: page,
       };
 
@@ -87,7 +94,9 @@ export default function CategoryList() {
       const response = await axiosPrivetInstance.get(CATEGORY_ENDPOINTS.LIST, {
         params,
       });
-      setCategories(response.data.data);
+
+      // Handle potential data inconsistencies
+      setCategories(response.data.data || []);
       setTotalPages(response.data.totalNumberOfPages || 1);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -95,7 +104,7 @@ export default function CategoryList() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -103,7 +112,7 @@ export default function CategoryList() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, fetchCategories]);
 
   const createCategory = async (data) => {
     try {
@@ -119,15 +128,8 @@ export default function CategoryList() {
 
   const updateCategoryDetails = async (data) => {
     try {
-      if (data.name === "") {
-        toast.error("Category name is required");
-        return;
-      }
-
-      if (data.name.length < 3) {
-        toast.error("Category name must be at least 3 characters");
-        return;
-      }
+      // Let the form validation handle required field and length validation
+      // to avoid duplicate validation logic
 
       const originalCategory = categories.find(cat => cat.id === selectedCategoryId);
       if (originalCategory && data.name === originalCategory.name) {
@@ -140,7 +142,6 @@ export default function CategoryList() {
         { name: data.name }
       );
 
-      console.log(data.name);
       toast.success("Category updated successfully");
       fetchCategories(currentPage, searchTerm);
       handleCloseModal();
@@ -155,8 +156,16 @@ export default function CategoryList() {
       await axiosPrivetInstance.delete(
         CATEGORY_ENDPOINTS.DELETE(selectedCategoryId)
       );
+
       toast.success("Category deleted successfully");
-      fetchCategories(currentPage, searchTerm);
+
+      // If this is the last item on this page and not the first page, go to previous page
+      if (categories.length === 1 && currentPage > 1) {
+        setCurrentPage(prev => prev - 1);
+      } else {
+        fetchCategories(currentPage, searchTerm);
+      }
+
       handleCloseModal();
     } catch (error) {
       console.error("Error deleting category:", error);
@@ -178,20 +187,21 @@ export default function CategoryList() {
     return (
       <nav className="mt-4">
         <ul className="pagination justify-content-center">
+          {/* Previous Button */}
           <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
             <button
-              className="page-link"
+              className="page-link btn btn-success text-success"
               onClick={() => handlePageChange(currentPage - 1)}
             >
               Previous
             </button>
           </li>
 
+          {/* Page Numbers */}
           {[...Array(totalPages)].map((_, index) => (
             <li
               key={index}
-              className={`page-item ${currentPage === index + 1 ? "active" : ""
-                }`}
+              className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
             >
               <button
                 className="page-link"
@@ -202,12 +212,10 @@ export default function CategoryList() {
             </li>
           ))}
 
-          <li
-            className={`page-item ${currentPage === totalPages ? "disabled" : ""
-              }`}
-          >
+          {/* Next Button */}
+          <li className={`page-item text-success ${currentPage === totalPages ? "disabled" : ""}`}>
             <button
-              className="page-link"
+              className="page-link btn btn-success text-success"
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
@@ -279,6 +287,7 @@ export default function CategoryList() {
                 type="text"
                 className={`form-control ${errors.name ? "is-invalid" : ""}`}
                 placeholder="Enter category name"
+                autoFocus
                 {...register("name", {
                   required: "Category name is required",
                   minLength: {
@@ -292,8 +301,19 @@ export default function CategoryList() {
               )}
             </div>
             <div className="d-grid">
-              <button type="submit" className="btn btn-success">
-                {modalType === "add" ? "Save Category" : "Update Category"}
+              <button
+                type="submit"
+                className="btn btn-success"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    {modalType === "add" ? "Saving..." : "Updating..."}
+                  </>
+                ) : (
+                  modalType === "add" ? "Save Category" : "Update Category"
+                )}
               </button>
             </div>
           </form>
@@ -328,6 +348,16 @@ export default function CategoryList() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={() => setSearchTerm("")}
+              aria-label="Clear search"
+            >
+              <i className="fa fa-times"></i>
+            </button>
+          )}
         </div>
       </div>
 
@@ -356,7 +386,7 @@ export default function CategoryList() {
               <tbody className="rounded-bottom">
                 {categories.map((category, index) => (
                   <tr key={category.id}>
-                    <td>{(currentPage - 1) * 5 + index + 1}</td>
+                    <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                     <td>{category.name}</td>
                     <td>
                       {new Date(category.creationDate).toLocaleDateString()}
@@ -366,7 +396,7 @@ export default function CategoryList() {
                         {visibleActionRows[category.id] ? (
                           <div className="bg-white shadow rounded position-absolute end-0 p-2 flex-column d-flex" style={{ minWidth: '120px', zIndex: 100, right: '0' }}>
                             <button
-                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2"
+                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2 text-success"
                               onClick={() => handleShowModal("update", category.id)}
                               title="Edit Category"
                             >
@@ -375,18 +405,18 @@ export default function CategoryList() {
                             </button>
                             <div className="dropdown-divider my-1"></div>
                             <button
-                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2"
+                              className="btn btn-sm d-flex align-items-center gap-2 text-start hover-bg-light py-2 text-success"
                               onClick={() => handleShowModal("delete", category.id)}
                               title="Delete Category"
                             >
-                              <i className="fa fa-trash text-danger"></i>
+                              <i className="fa fa-trash text-success"></i>
                               <span>Delete</span>
                             </button>
                           </div>
                         ) : (
                           <button
                             className="btn btn-sm rounded-circle"
-                            onClick={() => handleShowActionForRow(category.id)}
+                            onClick={(e) => handleShowActionForRow(category.id, e)}
                             title="Show Actions"
                             style={{ width: '32px', height: '32px' }}
                           >

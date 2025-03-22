@@ -5,3 +5,8 @@
     background-color: rgba(0, 146, 71, 1);
 }
 
+ 
+ .bg-warning-dash  {
+    background: rgba(236, 236, 0, 0.108);
+    border-radius: 30px;
+ }
