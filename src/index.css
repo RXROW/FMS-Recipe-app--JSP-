@@ -5,8 +5,37 @@
     background-color: rgba(0, 146, 71, 1);
 }
 
- 
+ body ,html{
+    overflow-x: hidden;
+}
+
  .bg-warning-dash  {
     background: rgba(236, 236, 0, 0.108);
     border-radius: 30px;
  }
+
+
+ table{
+    overflow-x: scroll !important;
+ }
+
+
+ /* Width of the scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* for horizontal scrollbar */
+}
+
+/* Track (the background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #269700;
+  border-radius: 10px;
+}
+
+ 
