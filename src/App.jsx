@@ -21,6 +21,7 @@ import UsersList from "./Moduals/Users/UsersList/UsersList";
 import ProtectedRoute from "./Moduals/Shared/ProtectedRoute/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext/AuthContext";
 import RecipeForm from "./Moduals/Recipes/Recipesform/Recipesform";
+import Registration from "./Moduals/Authentication/Register/Register";
 
 function App() {
    
@@ -35,7 +36,7 @@ function App() {
         { index: true, 
           element: loginData ? <Navigate to="/dashboard" /> : <Login   /> },
         { path: "login", element: <Login   /> },
-        { path: "register", element: <Register /> },
+        { path: "register", element: <Registration /> },
         { path: "forget-password", element: <ForgetPass /> },
         { path: "reset-password", element: <ResetPass /> },
         { path: "verify-account", element: <VerifyAccount /> },

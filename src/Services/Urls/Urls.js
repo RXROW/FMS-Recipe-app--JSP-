@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const baseURL = "https://upskilling-egypt.com:3006/api/v1";
- 
+ export const imgURL = "https://upskilling-egypt.com:3006";
 const getToken = () => localStorage.getItem("token");
  
  
@@ -33,7 +33,11 @@ export const RECIPES_URLS = {
   CREATE: "/Recipe",
   UPDATE: (id) => `/Recipe/${id}`,
   DELETE: (id) => `/Recipe/${id}`,
+  DELETE_FROM_FAVORITES: (id) => `/userRecipe/${id}`,
+  GET_USER_RECIPES: `/userRecipe`,
+  ADD_TO_FAVORITES: `/userRecipe`,
 };
+//DELETE 
 
 export const CATEGORY_ENDPOINTS = {
   LIST: "/Category",
@@ -41,4 +45,7 @@ export const CATEGORY_ENDPOINTS = {
   UPDATE: (id) => `/Category/${id}`,
   DELETE: (id) => `/Category/${id}`,
 };
-export const CHANGE_PASS =  "/Users/ChangePassword"
+export const CHANGE_PASS = "/Users/ChangePassword"
+export const ALL_TAGS = "/tag"
+
+ 
