@@ -28,16 +28,7 @@ const Login = () => {
     setError,
   } = useForm();
 
-  // Toast configuration
-  const toastConfig = {
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "colored",
-  };
+
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -51,7 +42,7 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
       saveLoginData();
 
-      toast.success("Login successful!", toastConfig);
+      toast.success("Login successful!");
 
       // Short delay to show toast before redirecting
       setTimeout(() => {
@@ -78,7 +69,7 @@ const Login = () => {
 
         toast.error("Invalid email. Please check your credentials.", toastConfig);
       } else {
-        toast.error(errorMessage, toastConfig);
+        toast.error(errorMessage);
       }
     } finally {
       setIsLoading(false);

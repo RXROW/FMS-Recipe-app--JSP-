@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { axiosPrivetInstance, CATEGORY_ENDPOINTS, RECIPES_URLS } from "../../../Services/Urls/Urls";
-import Header from "../../Shared/Header/Header";
-import img from "../../../assets/images/categoryHeader.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -16,12 +14,8 @@ export default function RecipeForm() {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
 
-  // Watch the categoriesIds field to monitor its value
-  const selectedCategories = watch("categoriesIds");
-
-  // Create a custom notification function to ensure toast works
   const notify = (message, type = "success") => {
     switch (type) {
       case "success":
@@ -94,7 +88,7 @@ export default function RecipeForm() {
     } catch (error) {
       notify("Failed to fetch recipe details", "error");
       console.error("Error fetching recipe:", error);
-      navigate("dashboard/recipes");
+      navigate("/dashboard/recipes");
     }
     setIsLoading(false);
   };
@@ -103,14 +97,15 @@ export default function RecipeForm() {
     setValue("name", recipe.name);
     setValue("price", recipe.price);
     setValue("description", recipe.description);
+    setValue("quantity", recipe.quantity || "100");
 
     // Handle categories (might be single or multiple)
     if (Array.isArray(recipe.categories)) {
       const categoryIds = recipe.categories.map(cat => parseInt(cat.id, 10));
-      setValue("categoriesIds", categoryIds);
+      setValue("categoriesIds", categoryIds[0]); // For this UI, we only use first category
     } else if (recipe.category) {
       // If single category is used
-      setValue("categoriesIds", [parseInt(recipe.category, 10)]);
+      setValue("categoriesIds", parseInt(recipe.category, 10));
     }
 
     // Handle tag
@@ -119,8 +114,6 @@ export default function RecipeForm() {
     } else if (recipe.tagId) {
       setValue("tagId", parseInt(recipe.tagId, 10));
     }
-
-    // For image, we can only show the current image but can't populate the file input
   };
 
   const handleFormSubmit = async (data) => {
@@ -133,11 +126,15 @@ export default function RecipeForm() {
     formData.append("name", String(data.name));
     formData.append("price", parseInt(data.price, 10));
     formData.append("description", String(data.description || ""));
-    formData.append("tagId", parseInt(data.tagId, 10));
+    formData.append("quantity", String(data.quantity || "100"));
 
-    // Convert categoriesIds array to comma-separated string
-    if (Array.isArray(data.categoriesIds) && data.categoriesIds.length > 0) {
-      formData.append("categoriesIds", data.categoriesIds.join(','));
+    if (data.tagId) {
+      formData.append("tagId", parseInt(data.tagId, 10));
+    }
+
+    // Convert categoriesIds to array format expected by API
+    if (data.categoriesIds) {
+      formData.append("categoriesIds", String(data.categoriesIds));
     }
 
     // Handle image file if present
@@ -184,13 +181,6 @@ export default function RecipeForm() {
 
   return (
     <>
-      <Header
-        title={isEditing ? "Edit Recipe" : "Add New Recipe"}
-        description="Manage your recipe details"
-        img={img}
-      />
-
-      {/* Configure ToastContainer with explicit settings */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -203,77 +193,69 @@ export default function RecipeForm() {
         pauseOnHover
       />
 
-      <div className="container-fluid p-4">
-        <div className="mb-4">
-          <h3>{isEditing ? "Edit Recipe" : "Add New Recipe"}</h3>
-          <p className="text-muted">Update recipe information here</p>
-        </div>
+      <div className="container py-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          {/* Recipe Name */}
+          <div className="mb-3">
+            <input
+              type="text"
+              className={`form-control bg-light ${errors.name ? "is-invalid" : ""}`}
+              placeholder="Recipe Name"
+              {...register("name", {
+                required: "Recipe name is required",
+                minLength: { value: 3, message: "Recipe name must be at least 3 characters" }
+              })}
+            />
+            {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+          </div>
 
-        <div className="card">
-          <div className="card-body">
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
-              <div className="mb-3">
-                <label htmlFor="recipeName" className="form-label">Recipe Name</label>
-                <input
-                  id="recipeName"
-                  type="text"
-                  className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                  placeholder="Enter recipe name"
-                  {...register("name", {
-                    required: "Recipe name is required",
-                    minLength: { value: 3, message: "Recipe name must be at least 3 characters" }
-                  })}
-                />
-                {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="recipePrice" className="form-label">Price</label>
-                <input
-                  id="recipePrice"
-                  type="number"
-                  step="0.01"
-                  className={`form-control ${errors.price ? "is-invalid" : ""}`}
-                  placeholder="Enter recipe price"
-                  {...register("price", {
-                    required: "Price is required",
-                    min: { value: 0, message: "Price must be non-negative" }
-                  })}
-                />
-                {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="recipeCategories" className="form-label">Categories</label>
+          {/* Category Dropdown */}
+          <div className="mb-3">
+            <div className="form-select bg-light d-flex justify-content-between align-items-center">
+              {categories.length > 0 ? (
                 <select
-                  id="recipeCategories"
-                  className={`form-select ${errors.categoriesIds ? "is-invalid" : ""}`}
-                  multiple
-                  {...register("categoriesIds", { required: "At least one category is required" })}
+                  className="form-select bg-light border-0"
+                  {...register("categoriesIds", { required: "Category is required" })}
                 >
+                  <option value="">Select a category</option>
                   {categories.map(category => (
                     <option key={category.id} value={parseInt(category.id, 10)}>
                       {category.name}
                     </option>
                   ))}
                 </select>
-                {errors.categoriesIds && <div className="invalid-feedback">{errors.categoriesIds.message}</div>}
-                <small className="form-text text-muted">Hold Ctrl/Cmd to select multiple categories</small>
+              ) : (
+                <span>Noodles</span>
+              )}
+            </div>
+            {errors.categoriesIds && <div className="invalid-feedback d-block">{errors.categoriesIds.message}</div>}
+          </div>
 
-                {/* Display selected categories for verification */}
-                {selectedCategories && selectedCategories.length > 0 && (
-                  <div className="mt-2 text-muted">
-                    Selected: {Array.from(selectedCategories).map(id => parseInt(id, 10)).join(', ')}
-                  </div>
-                )}
-              </div>
+          {/* Price */}
+          <div className="mb-3">
+            <div className="form-control bg-light d-flex justify-content-between align-items-center">
+              <input
+                type="number"
+                step="0.01"
+                className={`form-control bg-light border-0 ${errors.price ? "is-invalid" : ""}`}
+                placeholder="Price"
+                {...register("price", {
+                  required: "Price is required",
+                  min: { value: 0, message: "Price must be non-negative" }
+                })}
+              />
+              <span>EGP</span>
+            </div>
+            {errors.price && <div className="invalid-feedback d-block">{errors.price.message}</div>}
+          </div>
 
-              <div className="mb-3">
-                <label htmlFor="recipeTag" className="form-label">Tag</label>
+          {/* Tags Dropdown */}
+          <div className="mb-3">
+            <div className="form-select bg-light d-flex justify-content-between align-items-center">
+              {tags.length > 0 ? (
                 <select
-                  id="recipeTag"
-                  className={`form-select ${errors.tagId ? "is-invalid" : ""}`}
-                  {...register("tagId", { required: "Tag is required" })}
+                  className="form-select bg-light border-0"
+                  {...register("tagId")}
                 >
                   <option value="">Select a tag</option>
                   {tags.map(tag => (
@@ -282,53 +264,89 @@ export default function RecipeForm() {
                     </option>
                   ))}
                 </select>
-                {errors.tagId && <div className="invalid-feedback">{errors.tagId.message}</div>}
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="recipeDescription" className="form-label">Description</label>
-                <textarea
-                  id="recipeDescription"
-                  className={`form-control ${errors.description ? "is-invalid" : ""}`}
-                  placeholder="Enter recipe description"
-                  rows="3"
-                  {...register("description")}
-                ></textarea>
-                {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="recipeImage" className="form-label">Recipe Image</label>
-                <input
-                  id="recipeImage"
-                  type="file"
-                  className={`form-control ${errors.image ? "is-invalid" : ""}`}
-                  accept="image/*"
-                  {...register("image")}
-                />
-                {errors.image && <div className="invalid-feedback">{errors.image.message}</div>}
-              </div>
-
-              <div className="d-flex gap-3">
-                <button type="submit" className="btn btn-success" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      {isEditing ? "Updating..." : "Saving..."}
-                    </>
-                  ) : isEditing ? "Update Recipe" : "Save Recipe"}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => navigate("/dashboard/recipes")}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+              ) : (
+                <span>No tags available</span>
+              )}
+            </div>
           </div>
-        </div>
+
+          {/* Quantity */}
+          <div className="mb-3">
+            <div className="form-control bg-light d-flex justify-content-between align-items-center">
+              <input
+                type="text"
+                className="form-control bg-light border-0"
+                placeholder="100"
+                {...register("quantity")}
+              />
+              <span>g</span>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mb-4">
+            <label className="form-label">
+              Description <span className="text-danger">*</span>
+            </label>
+            <textarea
+              className={`form-control bg-light ${errors.description ? "is-invalid" : ""}`}
+              rows="6"
+              placeholder="Enter recipe description"
+              {...register("description", {
+                required: "Description is required"
+              })}
+            ></textarea>
+            {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+          </div>
+
+          {/* Image Upload */}
+          <div className="mb-4 p-4 border border-success border-dashed rounded text-center bg-light bg-opacity-25">
+            <div className="text-center mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-upload text-secondary" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+              </svg>
+            </div>
+            <p className="mb-0">
+              Drag & Drop or <span className="text-success fw-medium">Choose a Item Image</span> to Upload
+            </p>
+            <input
+              type="file"
+              className="d-none"
+              accept="image/*"
+              id="recipeImage"
+              {...register("image")}
+            />
+            <label htmlFor="recipeImage" className="d-block mt-2 cursor-pointer">
+              <span>Choose file</span>
+            </label>
+          </div>
+
+          {/* Buttons */}
+          <div className="d-flex justify-content-end gap-3">
+            <button
+              type="button"
+              className="btn btn-outline-secondary px-4 py-2"
+              onClick={() => navigate("/dashboard/recipes")}
+              style={{ borderRadius: "4px" }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-success px-4 py-2"
+              disabled={isLoading}
+              style={{ borderRadius: "4px" }}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Saving...
+                </>
+              ) : 'Save'}
+            </button>
+          </div>
+        </form>
       </div>
     </>
   );
