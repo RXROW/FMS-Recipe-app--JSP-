@@ -1,6 +1,6 @@
- # 🚀 React + Vite
+ #    Food Management System (FMS)
 
-This project provides a minimal setup to get **React** working in **Vite**, featuring Hot Module Replacement (HMR) and ESLint rules for code consistency.
+ Hey everyone! I’m super excited to introduce Food Management System (FMS) – a fully responsive web app built to streamline recipe management and user interactions. This project was a great learning experience, pushing me to dive deeper into React.js while handling real-world data, authentication, and user-friendly UI design.
 
  
 ## 📌 Plugins
