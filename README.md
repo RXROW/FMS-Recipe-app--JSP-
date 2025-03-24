@@ -1,14 +1,8 @@
-#  Food Management System (FMS)
+ # 🚀 React + Vite
 
 This project provides a minimal setup to get **React** working in **Vite**, featuring Hot Module Replacement (HMR) and ESLint rules for code consistency.
 
-## 🛠️ Features
-
-- ⚡ **Fast Development** – Vite's blazing-fast build process
-- 🔥 **Hot Module Replacement (HMR)** – Instant updates during development
-- ✅ **ESLint Integration** – Helps maintain clean and error-free code
-- 📦 **Optimized Build** – Efficient bundling for production
-
+ 
 ## 📌 Plugins
 
 Currently, two official plugins are available:
@@ -16,7 +10,7 @@ Currently, two official plugins are available:
 - [`@vitejs/plugin-react`](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) – Uses **Babel** for Fast Refresh
 - [`@vitejs/plugin-react-swc`](https://github.com/vitejs/vite-plugin-react-swc) – Uses **SWC** for Fast Refresh
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Tools
 
 - **React** – UI library for building interactive UIs
 - **Vite** – Fast build tool for modern web development
@@ -28,6 +22,26 @@ Currently, two official plugins are available:
 - **React Hook Form** – Form handling and validation
 - **React Toastify** – Notifications and alerts
 - **Bootstrap** – UI styling framework
+- **JWT** – Authentication management
+
+## 🔥 Key Features
+
+### 👨‍💻 Admin Portal:
+✅ Secure login & password recovery  
+✅ Add, update, and delete recipes easily  
+✅ Browse recipes with pagination  
+✅ Advanced search by keywords, tags, and categories  
+✅ Organize recipes into categories  
+✅ Manage registered users  
+
+### 👤 User Portal:
+✅ Sign up, log in & reset passwords  
+✅ Browse recipes with pagination  
+✅ Search and filter recipes effortlessly  
+✅ Add and remove favorites  
+
+## 🚀 Getting Started
+ 
 
 ### 2️⃣ Install Dependencies
 ```sh
